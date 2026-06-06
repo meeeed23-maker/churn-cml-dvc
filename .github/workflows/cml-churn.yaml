@@ -1,41 +1,71 @@
 name: churn-imbalanced-dataset
+
 on: [push]
+
 permissions: write-all
+
 jobs:
   run:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js (for CML)
+        uses: actions/setup-node@v3
         with:
           node-version: "16"
-      - uses: actions/setup-python@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - uses: iterative/setup-cml@v1
 
-      
-      - name: Prepare Environment
+      - name: Setup CML
+        uses: iterative/setup-cml@v1
+
+      - name: Install Python dependencies
         run: |
-          # Your ML workflow goes here
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Scripts execution
+      - name: Run training script
         run: |
           python script.py
 
-      - name: Generate Report
+      - name: Generate and post report with CML
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-
-          # Get the report
-          echo "## Metrics" > report.md
+          # Créer le rapport Markdown
+          echo "# 📊 Rapport d'entraînement du modèle" > report.md
+          echo "" >> report.md
+          
+          echo "## 📈 Métriques" >> report.md
+          echo '```' >> report.md
           cat metrics.txt >> report.md
-
-          awk 'NR%4{print "    " $0}{print ""}' metrics.txt >> report.md
-
-          echo "## Confusion Matrix" >> report.md
+          echo '```' >> report.md
+          echo "" >> report.md
+          
+          echo "## 🖼️ Matrice de confusion" >> report.md
           echo "![](./conf_matrix.png)" >> report.md
+          echo "" >> report.md
+          
+          echo "## 🔧 Informations techniques" >> report.md
+          echo "- Date d'exécution: $(date '+%Y-%m-%d %H:%M:%S')" >> report.md
+          echo "- Commit: ${{ github.sha }}" >> report.md
+          echo "- Auteur: ${{ github.actor }}" >> report.md
+          
+          # Publier le commentaire sur GitHub
           cml comment create report.md
+
+      - name: Upload artifacts (optional)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ml-artifacts
+          path: |
+            metrics.txt
+            conf_matrix.png
+          retention-days: 30
