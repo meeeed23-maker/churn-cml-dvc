@@ -57,10 +57,10 @@ jobs:
           echo "- Commit: ${{ github.sha }}" >> report.md
           echo "- Auteur: ${{ github.actor }}" >> report.md
           
-          # Publier le commentaire sur GitHub (Pull Request ou Commit)
+          # Publier le commentaire sur GitHub
           cml comment create report.md
 
-      - name: Upload artifacts
+      - name: Upload artifacts (optional)
         uses: actions/upload-artifact@v4
         if: always()
         with:
