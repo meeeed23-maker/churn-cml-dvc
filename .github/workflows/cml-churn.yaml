@@ -49,7 +49,7 @@ jobs:
           echo "" >> report.md
           
           echo "## 🖼️ Matrice de confusion" >> report.md
-          cml publish conf_matrix.png --md >> report.md
+          echo "![](./conf_matrix.png)" >> report.md
           echo "" >> report.md
           
           echo "## 🔧 Informations techniques" >> report.md
