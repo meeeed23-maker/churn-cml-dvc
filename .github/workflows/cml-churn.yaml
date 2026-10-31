@@ -10,20 +10,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js (for CML)
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version: "20"
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Setup CML
-        uses: iterative/setup-cml@v1
+        uses: iterative/setup-cml@v2
 
       - name: Install Python dependencies
         run: |
@@ -49,7 +49,7 @@ jobs:
           echo "" >> report.md
           
           echo "## 🖼️ Matrice de confusion" >> report.md
-          cml asset publish conf_matrix.png --md >> report.md
+          cml publish conf_matrix.png --md >> report.md
           echo "" >> report.md
           
           echo "## 🔧 Informations techniques" >> report.md
@@ -57,10 +57,10 @@ jobs:
           echo "- Commit: ${{ github.sha }}" >> report.md
           echo "- Auteur: ${{ github.actor }}" >> report.md
           
-          # Publier le commentaire sur GitHub
+          # Publier le commentaire sur GitHub (Pull Request ou Commit)
           cml comment create report.md
 
-      - name: Upload artifacts (optional)
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
